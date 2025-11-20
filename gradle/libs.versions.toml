@@ -1,0 +1,56 @@
+[versions]
+# Discord API wrapper
+jda = "5.6.1"
+
+# Commands helper
+jdaCommands = "4.0.0-beta.7"
+
+# Paginations
+paginationUtils = "4.1.4"
+
+# Music module
+lavaplayer = "2.2.4"
+youtubesource = "ff19b6f1751262ecba7b81fcf391b961008962d1-SNAPSHOT" # This is my last hope of making youtube source player stable by unstableing packages
+
+# Json parser
+gson = "2.13.1"
+
+# Logging
+slf4j = "2.0.17"
+logback = "1.5.18"
+
+# Misc
+lombok = "1.18.38"
+
+# Testing
+junit = "5.10.3"
+mockito = "5.13.0"
+
+# PostgresQL
+postgresQL = "42.7.7"
+
+# SpringBoot
+springBoot = "3.5.0"
+
+# Web API
+
+
+[libraries]
+libJDA = { module = "net.dv8tion:JDA", version.ref = "jda" }
+libLavaplayer = { module = "dev.arbjerg:lavaplayer", version.ref = "lavaplayer" }
+libYoutubesource = { module = "dev.lavalink.youtube:v2", version.ref = "youtubesource"}
+libGson = { module = "com.google.code.gson:gson", version.ref = "gson"}
+libSlf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+libLogback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+libLombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+libJDACommands = { module = "io.github.kaktushose:jda-commands", version.ref = "jdaCommands" }
+libSpringBootStarter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "springBoot" }
+libSpringBootStarterDataJpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
+libPostgresQL = { module = "org.postgresql:postgresql", version.ref = "postgresQL"}
+libPaginationUtils = { module = "com.github.ygimenez:Pagination-Utils", version.ref = "paginationUtils" }
+libSpringBootStarterWeb = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot"}
+libSpringBootStarterOAuth2 = { module = "org.springframework.boot:spring-boot-starter-oauth2-client", version.ref = "springBoot"}
+libSpringBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security", version.ref = "springBoot"}
+libJunitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+libMockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+libMockitoJupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }

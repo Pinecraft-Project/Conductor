@@ -1,0 +1,51 @@
+plugins {
+    id("java")
+    id("application")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+group = 'ua.beengoo.uahub.bot'
+version = 'unspecified'
+
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(24))
+}
+
+application {
+    mainClass.set("ua.beengoo.uahub.bot.HubBot")
+}
+
+run {
+    systemProperty 'log.level', 'DEBUG'
+    workingDir(rootDir)
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    mergeServiceFiles()
+    mainClassName = "ua.beengoo.uahub.bot.HubBot"
+    manifest {
+        attributes 'Main-Class': 'ua.beengoo.uahub.bot.HubBot'
+    }
+}
+
+tasks.build.dependsOn shadowJar
+
+dependencies {
+    implementation(project(":resources"))
+
+    implementation(libs.libJDA)
+    implementation(libs.libJDACommands)
+
+    implementation(libs.libLavaplayer)
+    implementation(libs.libYoutubesource)
+
+    implementation(libs.libGson)
+    implementation(libs.libSlf4j)
+    implementation(libs.libLogback)
+}
+
+test {
+    useJUnitPlatform()
+}
