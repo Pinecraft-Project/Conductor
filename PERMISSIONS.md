@@ -5,16 +5,17 @@ This bot uses a Bukkit-like permission system layered on top of Discord roles. N
 ## Music Player
 
 - music.ctrl: Access the player control panel and buttons.
-- music.play: Queue tracks or playlists via `/player play`.
-- music.pause: Pause/resume playback via `/player pause` or controls.
-- music.skip: Skip current track via `/player skip` or controls.
-- music.prev: Play previous track via `/player prev` or controls.
-- music.next: Play next track via `/player next` or controls.
-- music.jump: Jump to a position in queue via `/player jump` or controls.
-- music.queue: View queue via `/player queue` or controls.
-- music.np: View now-playing via `/player np`.
+- music.play: Queue tracks or playlists via `/play`.
+- music.search: Search for tracks and play them via `/search` (ignores `music.play`)
+- music.pause: Pause/resume playback via `/pause` or controls.
+- music.skip: Skip current track via `/skip` or controls.
+- music.prev: Play previous track via `/prev` or controls.
+- music.next: Play next track via `/next` or controls.
+- music.jump: Jump to a position in queue via `/jump` or controls.
+- music.queue: View queue via `/queue` or controls.
+- music.np: View now-playing via `/np`.
 - music.mode: Change repeat mode (used by settings and controls).
-- music.bye: Stop and disconnect via `/player bye` or controls.
+- music.bye: Stop and disconnect via `/stop` or controls.
 
 ### Personal Playlists
 

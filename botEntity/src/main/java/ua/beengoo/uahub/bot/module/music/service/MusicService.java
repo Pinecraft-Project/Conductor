@@ -3,13 +3,19 @@ package ua.beengoo.uahub.bot.module.music.service;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import org.springframework.stereotype.Service;
+import ua.beengoo.uahub.bot.Lang;
+import ua.beengoo.uahub.bot.layout.message.Embed;
 import ua.beengoo.uahub.bot.module.music.player.*;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Spring-managed facade around the music player to enable control from both Discord commands and
@@ -100,14 +106,16 @@ public class MusicService {
    * Returns a future that completes when the next queue addition (track or playlist) happens for
    * the given requester
    */
-  public java.util.concurrent.CompletableFuture<QueueAddInfo> awaitQueueAddFor(long requesterId) {
-    java.util.concurrent.CompletableFuture<QueueAddInfo> fut =
-        new java.util.concurrent.CompletableFuture<>();
+  public CompletableFuture<QueueAddInfo> awaitQueueAddFor(long requesterId) {
+    CompletableFuture<QueueAddInfo> fut =
+        new CompletableFuture<>();
     PlayerInstanceListener listener =
         new PlayerInstanceListener() {
           @Override
           public void onPlaylistLoaded(
-              com.sedmelluq.discord.lavaplayer.track.AudioPlaylist playlist, AudioPlayer player) {}
+              AudioPlaylist playlist, AudioPlayer player) {
+
+          }
 
           @Override
           public void onSearchFailed(AudioPlayer player) {}
@@ -130,7 +138,7 @@ public class MusicService {
             if (track != null
                 && track.getEntityOwner() != null
                 && track.getEntityOwner().getIdLong() == requesterId) {
-              fut.complete(new QueueAddInfo(false, track, null));
+              fut.complete(new QueueAddInfo(false, track, null, false));
             }
           }
 
@@ -139,7 +147,7 @@ public class MusicService {
             if (playlist != null
                 && playlist.getEntityOwner() != null
                 && playlist.getEntityOwner().getIdLong() == requesterId) {
-              fut.complete(new QueueAddInfo(true, null, playlist));
+                fut.complete(new QueueAddInfo(true, null, playlist, playlist.isSearchResult()));
             }
           }
 
@@ -153,6 +161,16 @@ public class MusicService {
 
           @Override
           public void onQueueFinished(AudioPlayer player) {}
+
+            @Override
+            public void onSearchLoaded(AudioPlaylist audioPlaylist, AudioPlayer player) {
+
+            }
+
+            @Override
+            public void onHeavyLoadWarn(AudioTrackMeta track, AudioPlayer player) {
+
+            }
         };
     PlayerController.getInstance().addListener(listener);
     fut.whenComplete((r, e) -> PlayerController.getInstance().removeListener(listener));
@@ -160,8 +178,8 @@ public class MusicService {
   }
 
   /** Info about what was added to the queue for a requester. */
-  public static record QueueAddInfo(
-      boolean playlist, AudioTrackMeta track, AudioPlaylistMeta playlistMeta) {}
+  public record QueueAddInfo(
+      boolean playlist, AudioTrackMeta track, AudioPlaylistMeta playlistMeta, boolean searchResult) {}
 
   private static class RuntimeListener implements PlayerInstanceListener {
     private Member lastRequester;
@@ -194,8 +212,8 @@ public class MusicService {
     @Override
     public void onTrackEnd(
         AudioTrackMeta track,
-        com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason endReason,
-        com.sedmelluq.discord.lavaplayer.player.AudioPlayer player) {
+        AudioTrackEndReason endReason,
+        AudioPlayer player) {
         if (endReason.equals(AudioTrackEndReason.LOAD_FAILED)){
             PlayerController.getInstance().removeFromQueue(track);
             return;
@@ -205,31 +223,50 @@ public class MusicService {
 
     @Override
     public void onTrackSkipped(
-        AudioTrackMeta track, com.sedmelluq.discord.lavaplayer.player.AudioPlayer player) {}
+        AudioTrackMeta track, AudioPlayer player) {}
 
     @Override
     public void onTrackQueueAdded(
-        AudioTrackMeta track, com.sedmelluq.discord.lavaplayer.player.AudioPlayer player) {}
+        AudioTrackMeta track, AudioPlayer player) {}
 
     @Override
     public void onPlaylistQueueAdded(
-        AudioPlaylistMeta playlist, com.sedmelluq.discord.lavaplayer.player.AudioPlayer player) {}
+        AudioPlaylistMeta playlist, AudioPlayer player) {}
 
-    @Override
-    public void onTrackLoaded(
-        com.sedmelluq.discord.lavaplayer.track.AudioTrack track,
-        com.sedmelluq.discord.lavaplayer.player.AudioPlayer player) {
-      PlayerController.getInstance().addToQueue(new AudioTrackMeta(track, lastRequester));
-      if (!PlayerController.getInstance().isPlaying()) PlayerController.getInstance().playQueue();
-    }
+        @Override
+        public void onTrackLoaded(
+            AudioTrack track,
+            AudioPlayer player) {
+            PlayerController.getInstance().addToQueue(new AudioTrackMeta(track, lastRequester));
+            if (!PlayerController.getInstance().isPlaying()) PlayerController.getInstance().playQueue();
+        }
 
-    @Override
-    public void onPlayerModeChanged(
-        PlayerMode modeBefore,
-        PlayerMode modeAfter,
-        com.sedmelluq.discord.lavaplayer.player.AudioPlayer player) {}
+        @Override
+        public void onPlayerModeChanged(PlayerMode modeBefore, PlayerMode modeAfter,AudioPlayer player) {}
 
-    @Override
-    public void onQueueFinished(com.sedmelluq.discord.lavaplayer.player.AudioPlayer player) {}
+        @Override
+        public void onQueueFinished(AudioPlayer player) {}
+
+        @Override
+        public void onSearchLoaded(AudioPlaylist audioPlaylist, AudioPlayer player) {
+
+        }
+
+        @Override
+        public void onHeavyLoadWarn(AudioTrackMeta track, AudioPlayer player) {
+            Message msg = Objects.requireNonNull(track.getEntityOwner().getGuild().getAudioManager().getConnectedChannel()).asGuildMessageChannel()
+                .sendMessageEmbeds(Embed.getWarn()
+                    .setTitle(Lang.get("music.warn.heavyload.title"))
+                    .setDescription(Lang.get("music.warn.heavyload.desc"))
+                    .build()).complete();
+            new Thread(() -> {
+                try {
+                    Thread.sleep(10000);
+                    msg.delete().queue();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
+        }
   }
 }

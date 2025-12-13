@@ -80,7 +80,105 @@ public class PlayerCommands {
     return allowed;
   }
 
-  /** /play — queue a track or playlist via URL */
+    @Command(value = "search", desc = "Пошук треку")
+    public void onSearch(
+        CommandEvent event,
+        @Param(name = "prompt", value = "Результат пошуку") String ref
+    ) {
+        if (!has(event, "music.search", "music.perm.search")) return;
+
+        Member m = event.getMember();
+        if (!isInVoice(m)) {
+            event.reply(
+                Embed.getError()
+                    .setTitle(Lang.get("music.error.not_in_voice"))
+            );
+            return;
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(ref);
+        } catch (Exception e) {
+            event.reply(Embed.getError().setDescription("Invalid search selection"));
+            return;
+        }
+
+        AudioTrack track =
+            SearchCache.get(event.getUser().getIdLong(), index);
+
+        if (track == null) {
+            event.reply(
+                Embed.getWarn()
+                    .setDescription("Search result expired. Please search again.")
+            );
+            return;
+        }
+
+        musicService.playQuery(
+            event.getGuild(),
+            m,
+            track.getInfo().uri
+        );
+
+        event.reply(
+            Embed.getInfo()
+                .setTitle(Lang.get("music.player.title"))
+                .setDescription(
+                    Lang.get("music.play.added.track")
+                        .formatted(track.getInfo().author, track.getInfo().title))
+        );
+    }
+
+    @AutoComplete({"search"})
+    public void onSearchAuto(AutoCompleteEvent event) {
+        String typed = event.jdaEvent().getFocusedOption().getValue();
+        if (typed == null || typed.length() < 2) {
+            event.replyChoices(List.of());
+            return;
+        }
+
+        long userId = event.getUser().getIdLong();
+
+        SearchManager.get().loadItem("ytsearch:" + typed, new AudioLoadResultHandler() {
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                if (!playlist.isSearchResult()) {
+                    event.replyChoices(List.of());
+                    return;
+                }
+
+                List<AudioTrack> tracks =
+                    playlist.getTracks().stream().limit(10).toList();
+
+                SearchCache.put(userId, tracks);
+
+                List<net.dv8tion.jda.api.interactions.commands.Command.Choice> choices =
+                    new ArrayList<>();
+
+                for (int i = 0; i < tracks.size(); i++) {
+                    AudioTrack t = tracks.get(i);
+                    String label = StringUtils.ellipsize(
+                        t.getInfo().author + " — " + t.getInfo().title, 100);
+
+                    choices.add(new net.dv8tion.jda.api.interactions.commands.Command.Choice(label, String.valueOf(i)));
+                }
+
+                event.replyChoices(choices);
+            }
+
+            @Override public void trackLoaded(AudioTrack track) {}
+            @Override public void noMatches() { event.replyChoices(List.of()); }
+            @Override public void loadFailed(FriendlyException e) {
+                event.replyChoices(List.of());
+            }
+        });
+    }
+
+
+
+    /** /play — queue a track or playlist via URL */
   @Command(value = "play", desc = "Відтворити трек або плейлист за URL")
   public void onPlay(
       CommandEvent event,
@@ -100,7 +198,6 @@ public class PlayerCommands {
       return;
     }
 
-    // Try to resolve as a user playlist first (exact name match)
     boolean handledAsPlaylist = false;
     try {
         UserPlaylist pl = playlistService.get(event.getUser().getIdLong(), url);
@@ -124,7 +221,6 @@ public class PlayerCommands {
     } catch (IllegalArgumentException ignore) {}
 
     if (!handledAsPlaylist) {
-      // Preload to detect duplicates for single track or YT/SC playlist
       Preview preview = previewLoad(url);
       if (preview != null) {
         java.util.Set<String> existing = new java.util.HashSet<>();

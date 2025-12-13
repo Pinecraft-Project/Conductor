@@ -12,18 +12,20 @@ import net.dv8tion.jda.api.entities.Member;
  * produce {@link AudioTrackMeta} entries for each track.
  */
 public class AudioPlaylistMeta {
-  @Getter private AudioPlaylist entity;
-  @Getter private Member entityOwner;
+    @Getter private boolean isSearchResult;
+    @Getter private AudioPlaylist entity;
+    @Getter private Member entityOwner;
 
-  public AudioPlaylistMeta(AudioPlaylist entity, Member owner) {
-    this.entity = entity;
-    this.entityOwner = owner;
-  }
+    public AudioPlaylistMeta(AudioPlaylist entity, Member owner) {
+        this.entity = entity;
+        this.entityOwner = owner;
+        this.isSearchResult = entity.isSearchResult();
+    }
 
-  /** Maps underlying playlist tracks to meta entries with the same owner. */
-  public Collection<? extends AudioTrackMeta> getTracks() {
-    List<AudioTrackMeta> trackMeta = new ArrayList<>();
-    entity.getTracks().forEach(e -> trackMeta.add(new AudioTrackMeta(e, entityOwner)));
-    return trackMeta;
-  }
+    /** Maps underlying playlist tracks to meta entries with the same owner. */
+    public Collection<? extends AudioTrackMeta> getTracks() {
+        List<AudioTrackMeta> trackMeta = new ArrayList<>();
+        entity.getTracks().forEach(e -> trackMeta.add(new AudioTrackMeta(e, entityOwner)));
+        return trackMeta;
+    }
 }

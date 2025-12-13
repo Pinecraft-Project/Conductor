@@ -10,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
+import dev.lavalink.youtube.YoutubeSourceOptions;
 import dev.lavalink.youtube.clients.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class PlayerInstance extends ListenerAdapter {
      */
     private YoutubeAudioSourceManager createYoutubeSourceManager() {
         // Create options for YouTube source
-        dev.lavalink.youtube.YoutubeSourceOptions options = new dev.lavalink.youtube.YoutubeSourceOptions();
+        YoutubeSourceOptions options = new YoutubeSourceOptions();
 
         // Configure remote cipher if enabled
         if (config.remoteCipher != null && config.remoteCipher.enabled) {
@@ -184,7 +185,11 @@ public class PlayerInstance extends ListenerAdapter {
 
             @Override
             public void playlistLoaded(AudioPlaylist audioPlaylist) {
-                playerController.getListeners().forEach(l -> l.onPlaylistLoaded(audioPlaylist, getPlayer()));
+                if (audioPlaylist.isSearchResult()) {
+                    playerController.getListeners().forEach(l -> l.onSearchLoaded(audioPlaylist, getPlayer()));
+                } else {
+                    playerController.getListeners().forEach(l -> l.onPlaylistLoaded(audioPlaylist, getPlayer()));
+                }
                 loadTrack(queries, index + 1);
             }
 
@@ -266,6 +271,10 @@ public class PlayerInstance extends ListenerAdapter {
         AudioTrack track = tracks.get(currentIndex).getEntity().makeClone();
         isPlaying = true;
         log.trace("Now playing: {} (by {})", track.getInfo().title, track.getInfo().author);
+        if (track.getDuration() >= 1800000) { //TODO: Interrupt if RAM usage is too high
+            log.warn("Ohh boy we got heavy one! Trying to load track over 30 minutes long: {} - {}", track.getInfo().author, track.getInfo().title);
+            PlayerController.getInstance().getListeners().forEach(l -> l.onHeavyLoadWarn(tracks.get(currentIndex), getPlayer()));
+        }
         getPlayer().playTrack(track);
     }
 

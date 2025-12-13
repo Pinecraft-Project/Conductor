@@ -6,6 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -598,4 +600,14 @@ public class PlayerControlPanel implements PlayerInstanceListener {
 //     }
 //     active = null;
   }
+
+    @Override
+    public void onSearchLoaded(AudioPlaylist audioPlaylist, AudioPlayer player) {
+
+    }
+
+    @Override
+    public void onHeavyLoadWarn(AudioTrackMeta track, AudioPlayer player) {
+
+    }
 }
