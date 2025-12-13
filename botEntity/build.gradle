@@ -7,11 +7,6 @@ plugins {
 group = 'ua.beengoo.uahub.bot'
 version = 'unspecified'
 
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(24))
-}
-
 application {
     mainClass.set("ua.beengoo.uahub.bot.HubBot")
 }

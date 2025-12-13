@@ -12,6 +12,10 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'com.diffplug.spotless'
 
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(24))
+    }
+
     dependencies {
         compileOnly(libs.libLombok)
         annotationProcessor(libs.libLombok)
