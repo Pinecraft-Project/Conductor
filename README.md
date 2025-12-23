@@ -2,11 +2,16 @@
 
 HubBot is Discord bot used by [UAHub Discord server](https://discord.gg/hcTgvbFBWZ)
 
+# Features
+- Rank system
+- Music player
+- Permission system
+
 # Getting started
 ## Build
 There is no releases for now, so you need to build bot first.
 
-You need Java 17 or above to be able to build project
+You need Java 17 or above to build project
 ```shell
 # Clone repository
 git clone https://github.com/UAHub-Project/HubBot.git
@@ -52,8 +57,8 @@ You will see something like that:
 - `targetGuildId` - Since bot is design for single guild, you must specify your Discord server on which it will be used
 - `postgresqlURL`, `postgresqlUser` and `postgresqlPassword` - HubBot require PostgresQL to store data, for now this is only option.
 - `language` - Bot interface language: `en - English (US)`, `uk - Ukrainian`
-- `youtubeOAuth` - Used to link burner Google account *see YouTube Configuration*
-- `remoteCipher` - yt-dlp wrapper server credentials *see YouTube Configuration*
+- `youtubeOAuth` - Used to link burner Google account [see YouTube Configuration](#youtube-configuration)
+- `remoteCipher` - yt-dlp wrapper server credentials [see YouTube Configuration](#youtube-configuration)
 
 
 ## YouTube Configuration
@@ -62,13 +67,13 @@ Since YouTube constantly trying to block video downloaders for *safety* reasons,
 So only solution is to set up [yt-cipher](https://github.com/kikkia/yt-cipher) server.
 
 
-Also to bypass age restricted content you need to use Google Account, so bot can have access to almost everything on youtube
+Also to bypass age restricted content you need to use Google account, so bot can have access to almost everything on YouTube
 
 ### Setup Google Account
-HubBot has utility to simply fetch OAuth2 refresh token from Google account, run this command to start it, and follow instructions.
+HubBot has utility to simply fetch OAuth2 refresh token from Google account, run command below to start it, and follow instructions
 ```shell
 java -cp botEntity.jar ua.beengoo.uahub.bot.HubBot --utility yto-helper
 ```
 > [!NOTE]
-> Do not use your main google account, use burner instead!
+> Do not use your main Google account, use burner instead!
 
