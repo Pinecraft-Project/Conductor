@@ -72,17 +72,12 @@ public class RankingService {
           assert member.getVoiceState() != null;
           StandardGuildChannel channel = member.getVoiceState().getChannel();
 
-          // Award points only for valid pool members
           if (channel != null && validForVoicePool(member)) {
             long joinTime = voiceMember.getTimeConnected();
             double points = (double) ((currentTime - joinTime) / 60000);
             if (points >= MAX_VOICE_SESSION_POINTS_COMBO) {
               points = MAX_VOICE_SESSION_POINTS_COMBO;
             }
-            log.info(
-                "User {} got {} points from pool for {}s (not including multiplier)",
-                member.getEffectiveName(),
-                points, (currentTime - joinTime) / 1000);
             awardVoicePoints(member, channel, points);
           }
 

@@ -20,8 +20,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ua.beengoo.uahub.bot.config.ConfigurationFile;
 
 /**
- * Low-level player backed by LavaPlayer. Manages queue, repeat modes and emits events to {@link
- * PlayerInstanceListener}s.
+ * Wrapper over LavaPlayer
  */
 @Slf4j
 public class PlayerInstance extends ListenerAdapter {
@@ -69,7 +68,7 @@ public class PlayerInstance extends ListenerAdapter {
 
         // Configure remote cipher if enabled
         if (config.remoteCipher != null && config.remoteCipher.enabled) {
-            log.info("Configuring remote cipher server: {}", config.remoteCipher.url);
+            log.info("Using cipher server: {}", config.remoteCipher.url);
             options.setRemoteCipherUrl(
                 config.remoteCipher.url,
                 config.remoteCipher.password
@@ -81,9 +80,6 @@ public class PlayerInstance extends ListenerAdapter {
         if (config.youtubeOAuth.enabled &&
             config.youtubeOAuth.refreshToken != null &&
             !config.youtubeOAuth.refreshToken.isEmpty()) {
-
-            log.info("Initializing YouTube source with OAuth authentication");
-
             try {
                 // Prioritize Web client (best Opus support) even with OAuth
                 // TV clients are OAuth-capable but Web has better format compatibility
@@ -97,27 +93,26 @@ public class PlayerInstance extends ListenerAdapter {
                 // Enable OAuth with refresh token
                 youtube.useOauth2(config.youtubeOAuth.refreshToken, true);
 
-                log.info("YouTube OAuth authentication configured successfully (Web + TV clients)");
+                log.info("Applying Google Account credentials successfully!");
                 return youtube;
 
             } catch (Exception e) {
-                log.error("Failed to configure YouTube OAuth, falling back to guest mode", e);
+                log.error("Failed to configure Google Account for YouTube playback, falling back to guest mode", e);
             }
         }
 
-        // Fallback to guest mode - prioritize Opus-capable clients to avoid AAC decoder errors
-        log.info("Using YouTube in guest mode with Opus-capable clients");
+        log.info("Using YouTube in guest mode...");
         youtube = new YoutubeAudioSourceManager(
             options,
-            new Web(),          // Primary: Best Opus support
-            new AndroidMusic(), // Secondary: Opus support, music-focused
-            new Music()         // Tertiary: Search only
+            new Web(),
+            new AndroidMusic(),
+            new Music()
         );
 
         return youtube;
     }
 
-    /** Lazily creates and returns the underlying {@link AudioPlayer}. */
+    /** Creates and returns the underlying {@link AudioPlayer}. */
     public AudioPlayer getPlayer() {
         if (audioPlayer == null) {
             audioPlayer = playerManager.createPlayer();
@@ -154,7 +149,7 @@ public class PlayerInstance extends ListenerAdapter {
                 return me;
             }
         }
-        log.warn("Track metadata not found. size={}, entity={}.", tracks.size(), entity);
+        log.warn("Track metadata unresolved. size={}, entity={}.", tracks.size(), entity);
         return null;
     }
 
@@ -207,7 +202,7 @@ public class PlayerInstance extends ListenerAdapter {
         });
     }
 
-    /** Adds a single track to the end of the queue (bounded size). */
+    /** Adds a single track to the end of the queue. */
     public void addToQueue(AudioTrackMeta track) {
         // Prevent duplicates by identifier
         String id = track.getEntity() != null ? track.getEntity().getIdentifier() : null;
