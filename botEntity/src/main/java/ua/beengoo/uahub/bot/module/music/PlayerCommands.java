@@ -100,7 +100,9 @@ public class PlayerCommands {
         try {
             index = Integer.parseInt(ref);
         } catch (Exception e) {
-            event.reply(Embed.getError().setDescription("Invalid search selection"));
+            event.jdaEvent().replyEmbeds(
+                Embed.getError().setDescription("Hold on! Choose track from the list!").build()
+            ).setEphemeral(true).queue();
             return;
         }
 
@@ -108,10 +110,9 @@ public class PlayerCommands {
             SearchCache.get(event.getUser().getIdLong(), index);
 
         if (track == null) {
-            event.reply(
-                Embed.getWarn()
-                    .setDescription("Search result expired. Please search again.")
-            );
+            event.jdaEvent().replyEmbeds(
+                Embed.getError().setDescription("Unable to find selected track, sorry, try again!").build()
+            ).setEphemeral(true).queue();
             return;
         }
 
