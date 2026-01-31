@@ -44,7 +44,7 @@ public class PlayerInstance extends ListenerAdapter {
 
         playerManager
             .getConfiguration()
-            .setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
+            .setResamplingQuality(AudioConfiguration.ResamplingQuality.MEDIUM);
         playerManager.getConfiguration().setOutputFormat(StandardAudioDataFormats.DISCORD_OPUS);
 
         // Create YouTube source manager with optional authentication
@@ -81,13 +81,9 @@ public class PlayerInstance extends ListenerAdapter {
             config.youtubeOAuth.refreshToken != null &&
             !config.youtubeOAuth.refreshToken.isEmpty()) {
             try {
-                // Prioritize Web client (best Opus support) even with OAuth
-                // TV clients are OAuth-capable but Web has better format compatibility
                 youtube = new YoutubeAudioSourceManager(
                     options,
-                    new Web(),              // Primary: Opus support, best reliability
-                    new TvHtml5Embedded(),  // OAuth-capable fallback
-                    new AndroidMusic()      // Final fallback with Opus
+                    new Tv(), new Web() // Miracle that it still works tbh
                 );
 
                 // Enable OAuth with refresh token
@@ -380,9 +376,11 @@ public class PlayerInstance extends ListenerAdapter {
         playerController
             .getListeners()
             .forEach(
-                l ->
-                    l.onTrackSkipped(
-                        fetchMetaFromEntity(getPlayer().getPlayingTrack().makeClone()), getPlayer()));
+                l -> {
+                    if (getPlayer().getPlayingTrack() != null)
+                        l.onTrackSkipped(
+                            fetchMetaFromEntity(getPlayer().getPlayingTrack().makeClone()), getPlayer());
+                });
         try {
             removeFromQueue(fetchMetaFromEntity(audioPlayer.getPlayingTrack()));
             playNext(true);

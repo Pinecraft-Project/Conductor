@@ -203,6 +203,25 @@ public class MusicService {
     public void onLoadFailed(
         FriendlyException e,
         AudioPlayer player) {
+        Message msg = lastRequester.getVoiceState().getChannel().asGuildMessageChannel().sendMessageEmbeds(
+            Embed.getError().setTitle("Unable to load track").setDescription("""
+                Due to platforms restrictions player might break sometimes, its totally expected to happen.
+
+                Try this steps:
+                > **Search at SoundCloud:** by adding `at^sc` in search prompt
+                > **Try different link:** It might be some video specific restriction
+                > **Host yourself:** Player supports direct links to audio source of **any** format!
+                """).build()
+        ).complete();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            msg.delete().queue();
+        }).start();
     }
 
     @Override

@@ -100,15 +100,15 @@ public class PlayerControlPanel implements PlayerInstanceListener {
           case NOTHING -> Lang.get("music.ctrl.mode.nothing");
         };
     return List.of(
-        Button.primary("pl.prev", Lang.get("music.ctrl.prev")),
-        Button.primary("pl.pause", pauseLabel),
-        Button.primary("pl.next", Lang.get("music.ctrl.next")),
-        Button.primary("pl.skip", Lang.get("music.ctrl.skip")),
-        Button.primary("pl.queue", Lang.get("music.ctrl.queue")),
-        Button.primary("pl.mode", modeLabel),
-        Button.primary("pl.-10", Lang.get("music.ctrl.shiftn10")),
-        Button.primary("pl.+10", Lang.get("music.ctrl.shiftp10")),
-        Button.primary("pl.jump", Lang.get("music.ctrl.jump")),
+        Button.secondary("pl.prev", Lang.get("music.ctrl.prev")),
+        Button.secondary("pl.pause", pauseLabel),
+        Button.secondary("pl.next", Lang.get("music.ctrl.next")),
+        Button.secondary("pl.skip", Lang.get("music.ctrl.skip")),
+        Button.secondary("pl.queue", Lang.get("music.ctrl.queue")),
+        Button.secondary("pl.mode", modeLabel),
+        Button.secondary("pl.-10", Lang.get("music.ctrl.shiftn10")),
+        Button.secondary("pl.+10", Lang.get("music.ctrl.shiftp10")),
+        Button.secondary("pl.jump", Lang.get("music.ctrl.jump")),
         Button.danger("pl.bye", Lang.get("music.ctrl.bye")));
   }
 

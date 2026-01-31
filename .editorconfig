@@ -13,6 +13,5 @@ trim_trailing_whitespace = true
 trim_trailing_whitespace = false
 
 [*.java]
-ij_java_allow_trailing_comma = true
 ij_java_line_comment_add_space = true
 ij_java_imports_layout = explicitly_imported,*,java.**,javax.**

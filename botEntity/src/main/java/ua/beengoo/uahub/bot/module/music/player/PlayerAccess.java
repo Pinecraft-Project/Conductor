@@ -1,6 +1,8 @@
 package ua.beengoo.uahub.bot.module.music.player;
 
 import com.github.kaktushose.jda.commands.dispatching.events.interactions.CommandEvent;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -9,15 +11,9 @@ import ua.beengoo.uahub.bot.module.permissions.service.PermissionService;
 
 /** Helper for access control to player operations based on owner, roles and permission nodes. */
 public class PlayerAccess {
+  @Getter
+  @Setter
   private static Long ownerId;
-
-  public static Long getOwnerId() {
-    return ownerId;
-  }
-
-  public static void setOwnerId(Long id) {
-    ownerId = id;
-  }
 
   public static void clearOwner() {
     ownerId = null;

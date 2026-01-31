@@ -20,7 +20,6 @@ public final class SearchManager {
             new YoutubeAudioSourceManager(
                 true,
                 new Web(),
-                new WebEmbedded(),
                 new AndroidMusic(),
                 new Music()
             );

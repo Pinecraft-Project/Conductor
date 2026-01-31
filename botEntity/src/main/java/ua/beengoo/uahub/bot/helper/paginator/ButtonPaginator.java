@@ -50,13 +50,13 @@ public class ButtonPaginator {
 
       includedButtons.forEach((a) -> {
           switch (a) {
-              case FIRST -> buttons.add(Button.primary("first", Lang.get("paginator.first"))
+              case FIRST -> buttons.add(Button.secondary("first", Lang.get("paginator.first"))
                   .withDisabled(currentPage == 0));
-              case PREVIOUS -> buttons.add(Button.primary("prev", Lang.get("paginator.prev"))
+              case PREVIOUS -> buttons.add(Button.secondary("prev", Lang.get("paginator.prev"))
                   .withDisabled(currentPage == 0));
-              case NEXT -> buttons.add(Button.primary("next", Lang.get("paginator.next"))
+              case NEXT -> buttons.add(Button.secondary("next", Lang.get("paginator.next"))
                   .withDisabled(currentPage == pages.size() - 1));
-              case LAST -> buttons.add(Button.primary("last", Lang.get("paginator.last"))
+              case LAST -> buttons.add(Button.secondary("last", Lang.get("paginator.last"))
                   .withDisabled(currentPage == pages.size() - 1));
           }
       });
